@@ -22,12 +22,11 @@ function main() {
   rp(BASE_URL).then(html => cheerio.load(html)).then(async function ($) {
     const href = $('#divSystemFoodMenu a').attr('href')
     const pdfUrl = url.resolve(BASE_URL, href)
-    const basename = path.basename(href, '.pdf')
     const downloadPath = tempfile('.pdf')
     const xlsPath = tempfile('.xls')
 
     // 20170928093553178
-    var matchData = basename.match(/(\d{4})(\d{2})(\d{2})/)
+    var matchData = $('#divSystemFoodMenu a').attr('title').match(/(\d{4})\-(\d{2})\-(\d{2})/)
 
     await rp(pdfUrl, { encoding: 'binary' }).then(res => {
       const buffer = Buffer.from(res, 'binary');
@@ -50,8 +49,12 @@ function main() {
         fs.writeFileSync(xlsPath, buffer, 'binary');
         const worksheets = xlsx.parse(xlsPath);
 
-        //                                   month is zero-based
-        var firstDay = new Date(matchData[1], matchData[2] - 1, matchData[3])
+        //                                              month is zero-based
+        var uploadedDay = new Date(Date.UTC(matchData[1], matchData[2] - 1, matchData[3]))
+
+        // find neareast monday
+        //                                     to next monday
+        var firstDay = uploadedDay.addDays((8 - uploadedDay.getDay()) % 7)
 
         let data = {}
         for (var i = 0; i < worksheets.length; i++) {
