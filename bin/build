@@ -78,7 +78,7 @@ function main() {
           data[dayString]['dinner'] = addMeals(2)
         }
 
-        console.log(data)
+        // console.log(data)
         fs.writeFileSync(path.resolve(__dirname, '../data.json'), JSON.stringify(data, null, 2))
       })
     })
