@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e
+
+if [ "$TRAVIS_BRANCH" == "data" ]; then
+  ./bin/build
+  deploy_data
+fi
+
+if [ "$TRAVIS_BRANCH" == "web" ]; then
+  # TODO
+fi
+
+deploy_data () {
+  OUTPUT_FOLDER = "data"
+  TARGET_BRANCH = "data"
+
+  # Save some useful information
+  REPO=`git config remote.origin.url`
+  SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+  SHA=`git rev-parse --verify HEAD`
+
+  mkdir -p $OUTPUT_FOLDER
+  cd $OUTPUT_FOLDER
+  git clone $REPO .
+  git checkout $TARGET_BRANCH || git checkout -b $TARGET_BRANCH origin/$TARGET_BRANCH
+  cd ..
+
+  # overwrite new data
+  mv data.json $OUTPUT_FOLDER
+
+  git config user.name "Travis CI"
+  git config user.email "travis-ci@w3.org"
+
+  # If there are no changes to the compiled out (e.g. this is a README update) then just bail.
+  if [ -n "$(git status --porcelain)" ]; then
+    echo "Will deploy a new version";
+  else
+    echo "No changes to the output on this push; exiting."
+    exit 0
+  fi
+
+  git add --all
+  git commit -m "Update data: ${SHA}"
+
+  git push $SSH_REPO $TARGET_BRANCH
+}
