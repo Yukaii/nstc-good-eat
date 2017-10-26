@@ -5,7 +5,8 @@
   "main": "bin/build",
   "scripts": {
     "test": "standard .",
-    "build": "node bin/build.js"
+    "build": "node bin/build.js",
+    "dev": "http-server www"
   },
   "author": "Yukai Huang <yukaihuangtw@gmail.com> (https://yukaii.tw)",
   "license": "ISC",
@@ -18,6 +19,7 @@
     "tempfile": "^2.0.0"
   },
   "devDependencies": {
+    "http-server": "^0.10.0",
     "standard": "^10.0.3"
   }
 }

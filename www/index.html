@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="國訓每日菜單">
+  <title>國訓中心每日菜單</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-carousel@0.6.5/dist/vue-carousel.min.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.0/axios.min.js" integrity="sha256-ReCG8xthuE96rBkv5Cr/V+Wg42Gst+HCf0kNQufB9as=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js" integrity="sha256-/GXjBGBWRx8/y1Be190w3hrUOFXNs9qPhthi0tbNnG8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  <style>
+    html, body {
+      background-color: #ebe3cc;
+      color: #31302b;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    #main-container {
+      background-image: url(./images/pig.png);
+      background-size: cover;
+      background-position: center;
+
+      padding: 2em auto;
+      min-height: 100vh;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+              justify-content: center;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+              flex-direction: column;
+    }
+
+    #menu {
+      box-sizing: border-box;
+      padding: 2em 1em;
+      max-width: 568px;
+      background-color: #ebe3cc;
+
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+              justify-content: center;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+              flex-direction: column;
+    }
+
+    #menu h5 {
+      text-align: center;
+    }
+
+    #menu .date-block {
+      text-align: center;
+    }
+
+    #menu .menu-block {
+      margin: .5em 0;
+    }
+
+    #menu .title-block {
+      display: block;
+      margin-bottom: 2.5em;
+      border-bottom-width: 0.7em;
+      border-bottom-style: solid;
+      border-bottom-color: #31302b;
+    }
+
+    #menu h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="container-fluid" id="main-container">
+      <div class="container" id="menu">
+        <div class="title-block">
+          <h1>今天吃什麼</h1>
+        </div>
+
+        <carousel ref="carousel" v-if="menus" class="carousel" :scroll-per-page="true" :per-page="1">
+          <slide v-for="menu in formattedMenus" :key="menu.key">
+            <div class="date-block">
+              {{ menu.key }}
+            </div>
+
+            <div class="menu-block">
+              <h5>早餐</h5>
+              {{ menu.data["breakfast"].join(' | ') }}
+            </div>
+
+            <div class="menu-block">
+              <h5>午餐</h5>
+              {{ menu.data["launch"].join(' | ') }}
+            </div>
+
+            <div class="menu-block">
+              <h5>晚餐</h5>
+              {{ menu.data["dinner"].join(' | ') }}
+            </div>
+          </slide>
+        </carousel>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    var app = new Vue({
+      el: '#app',
+      components: {
+        carousel: VueCarousel.Carousel,
+        slide: VueCarousel.Slide
+      },
+      mounted() {
+        axios.get('https://raw.githubusercontent.com/Yukaii/nstc-good-eat/data-store/data.json').then(function (response) {
+          var rawMenu = response.data
+          this.dates = Object.keys(rawMenu)
+          this.menus = rawMenu
+
+          Vue.nextTick(function() {
+            if (this.$refs.carousel) {
+              // scroll to Today
+              var todayString = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+              this.$refs.carousel.currentPage = this.dates.indexOf(todayString)
+            }
+          }.bind(this))
+        }.bind(this))
+      },
+      computed: {
+        formattedMenus () {
+          return this.dates.map(function (dateKey) {
+            return {
+              key: dateKey,
+              data: this.menus[dateKey]
+            }
+          }.bind(this))
+        }
+      },
+      data: {
+        menus: null,
+        dates: []
+      }
+    })
+  </script>
+</body>
+</html>
