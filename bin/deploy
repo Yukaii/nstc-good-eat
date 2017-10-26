@@ -34,11 +34,35 @@ deploy_data () {
   git push $SSH_REPO $TARGET_BRANCH
 }
 
+deploy_web () {
+  OUTPUT_FOLDER="www"
+  TARGET_BRANCH="gh-pages"
+
+  # Save some useful information
+  REPO=`git config remote.origin.url`
+  SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+  SHA=`git rev-parse --verify HEAD`
+
+  cd $OUTPUT_FOLDER
+
+  git config user.name "Travis CI"
+  git config user.email "travis-ci@w3.org"
+
+  git init
+  git remote add origin $SSH_REPO
+  git checkout -b $TARGET_BRANCH
+
+  git add --all
+  git commit -m "Deploy web with ${SHA}"
+
+  git push -f $SSH_REPO $TARGET_BRANCH
+}
+
 if [ "$TRAVIS_BRANCH" == "data" ]; then
   npm run build
   deploy_data
 fi
 
-if [ "$TRAVIS_BRANCH" == "web" ]; then
-  echo 'TODO'
+if [ "$TRAVIS_BRANCH" == "master" ]; then
+  deploy_web
 fi
