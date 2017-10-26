@@ -40,5 +40,5 @@ if [ "$TRAVIS_BRANCH" == "data" ]; then
 fi
 
 if [ "$TRAVIS_BRANCH" == "web" ]; then
-  # TODO
+  echo 'TODO'
 fi
