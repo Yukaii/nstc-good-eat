@@ -35,7 +35,7 @@ deploy_data () {
 }
 
 if [ "$TRAVIS_BRANCH" == "data" ]; then
-  ./bin/build
+  npm run build
   deploy_data
 fi
 

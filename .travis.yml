@@ -6,7 +6,6 @@ cache:
     - node_modules
 before_install:
   - chmod +x ./bin/deploy
-  - chmod +x ./bin/build
   - chmod +x ./bin/add-ssh-key
   - ./bin/add-ssh-key
 script:
