@@ -21,6 +21,7 @@
       color: #31302b;
       font-size: 18px;
       line-height: 1.5;
+      overflow-y: hidden;
     }
 
     #main-container {
@@ -77,14 +78,26 @@
 
     #menu .title-block {
       display: block;
-      margin-bottom: 2.5em;
-      border-bottom-width: 0.7em;
+      margin-bottom: 2em;
+      text-align: center;
+    }
+
+    #menu h1 {
+      display: inline-block;
+      text-align: center;
+      border-bottom-width: 0.2em;
       border-bottom-style: solid;
       border-bottom-color: #31302b;
     }
 
-    #menu h1 {
-      text-align: center;
+    @media screen and (max-width: 320px) {
+      #menu h1 {
+        font-size: 20px;
+      }
+
+      #menu .title-block {
+        margin-bottom: 1em;
+      }
     }
   </style>
 </head>
@@ -96,7 +109,7 @@
           <h1>今天吃什麼</h1>
         </div>
 
-        <carousel ref="carousel" v-if="menus" class="carousel" :scroll-per-page="true" :per-page="1">
+        <carousel ref="carousel" v-if="menus" class="carousel" :scroll-per-page="true" :per-page="1" :min-swipe-sistance="16">
           <slide v-for="menu in formattedMenus" :key="menu.key">
             <div class="date-block">
               {{ menu.key }}
